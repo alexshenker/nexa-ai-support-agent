@@ -1,6 +1,4 @@
-import ai_client, { MODEL } from "@/app/ai/ai";
-import { MAX_CHARACTERS } from "@/app/utils/constants";
-import handleTicketCreation from "@/app/utils/handleTicketCreation";
+import ai_client, { MODEL } from "@/ai/ai";
 import {
     AIResponse,
     AIResponseID,
@@ -8,6 +6,8 @@ import {
     UserData,
     UserRequest,
 } from "@/types";
+import { MAX_CHARACTERS } from "@/utils/constants";
+import handleTicketCreation from "@/utils/handleTicketCreation";
 import { NextRequest } from "next/server";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
 

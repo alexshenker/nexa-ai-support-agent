@@ -1,7 +1,7 @@
 "use client";
-import { MAX_AI_RESPONSES, MAX_CHARACTERS } from "@/app/utils/constants";
-import sendUserMessage from "@/app/utils/sendUserMessage";
 import { AIResponseID, UserRequest } from "@/types";
+import { MAX_AI_RESPONSES, MAX_CHARACTERS } from "@/utils/constants";
+import sendUserMessage from "@/utils/sendUserMessage";
 import { Box, Button, Flex, Input, Skeleton, Text } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { v4 } from "uuid";

@@ -1,3 +1,4 @@
+import { Ticket, TicketId } from "@/types";
 import Database from "better-sqlite3";
 import { z } from "zod";
 const db = new Database("demo.db");
@@ -9,7 +10,8 @@ db.exec(`
     user_last TEXT,
     category TEXT,
     description TEXT,
-    status TEXT DEFAULT 'open'
+    status TEXT DEFAULT 'open',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
    CREATE TABLE IF NOT EXISTS categories (
@@ -18,25 +20,9 @@ db.exec(`
   );
 `);
 
-export type TicketId = number & { __brand: "Ticket_Id" };
-export const TicketId = z.custom<TicketId>();
-
-const ticketStatuses = ["open", "closed"] as const;
-const TicketStatus = z.enum(ticketStatuses);
-export type TicketStatus = z.infer<typeof TicketStatus>;
-
-const Ticket = z.object({
-    id: TicketId,
-    user_first: z.string(),
-    user_last: z.string(),
-    category: z.string(),
-    description: z.string(),
-    status: TicketStatus,
-});
-
-type Ticket = z.infer<typeof Ticket>;
-
-export function createTicket(ticket: OmitMod<Ticket, "id" | "status">): void {
+export function createTicket(
+    ticket: OmitMod<Ticket, "id" | "status" | "created_at">
+): void {
     const stmt = db.prepare(
         "INSERT INTO tickets (user_first, user_last, category, description) VALUES (?, ?, ?, ?)"
     );

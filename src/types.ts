@@ -31,3 +31,22 @@ export const ResponseToUser = z.object({
 });
 
 export type ResponseToUser = z.infer<typeof ResponseToUser>;
+
+export type TicketId = number & { __brand: "Ticket_Id" };
+export const TicketId = z.custom<TicketId>();
+
+export const ticketStatuses = ["open", "closed"] as const;
+export const TicketStatus = z.enum(ticketStatuses);
+export type TicketStatus = z.infer<typeof TicketStatus>;
+
+export const Ticket = z.object({
+    id: TicketId,
+    user_first: z.string(),
+    user_last: z.string(),
+    category: z.string(),
+    description: z.string(),
+    status: TicketStatus,
+    created_at: z.string(),
+});
+
+export type Ticket = z.infer<typeof Ticket>;
