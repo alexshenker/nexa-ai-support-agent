@@ -1,6 +1,7 @@
 import { Ticket, TicketId } from "@/types";
 import Database from "better-sqlite3";
 import { z } from "zod";
+import sample_tickets from "./sample_tickets";
 const db = new Database("demo.db");
 
 db.exec(`
@@ -19,6 +20,28 @@ db.exec(`
     name TEXT UNIQUE
   );
 `);
+
+//Add from samples
+const count = db.prepare("SELECT COUNT(*) as count FROM tickets").get() as {
+    count: number;
+};
+
+if (count.count === 0) {
+    const stmt = db.prepare(
+        "INSERT INTO tickets (user_first, user_last, category, description, status, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+    );
+
+    sample_tickets.forEach((ticket) => {
+        stmt.run(
+            ticket.user_first,
+            ticket.user_last,
+            ticket.category,
+            ticket.description,
+            ticket.status,
+            ticket.created_at
+        );
+    });
+}
 
 export function createTicket(
     ticket: OmitMod<Ticket, "id" | "status" | "created_at">
