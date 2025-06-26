@@ -1,5 +1,7 @@
 "use client";
-import { AIResponseID, ResponseToUser, UserRequest } from "@/types";
+import { MAX_CHARACTERS } from "@/app/utils/constants";
+import sendUserMessage from "@/app/utils/sendUserMessage";
+import { AIResponseID, UserRequest } from "@/types";
 import { Box, Button, Flex, Input, Text } from "@chakra-ui/react";
 import { useState } from "react";
 import { v4 } from "uuid";
@@ -40,7 +42,7 @@ export function ChatBox() {
     const [lastAIResponseID, setLastAIResponseID] =
         useState<AIResponseID | null>(null);
 
-    const sendUserMessage = async () => {
+    const handleUserMessage = async () => {
         const body: UserRequest = {
             message: inputValue,
             previous_response_id: lastAIResponseID,
@@ -57,53 +59,41 @@ export function ChatBox() {
             },
         ]);
 
-        try {
-            const res = await fetch("/api/ai_message", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-            });
+        const res = await sendUserMessage(body);
 
-            if (!res.ok) {
-                const error = await res.json();
-                console.error("Error sending message:", error);
-
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    responseFailureMessage,
-                ]);
-
-                return;
-            }
-
-            const data = await res.json();
-
-            const dataParsed = ResponseToUser.safeParse(data);
-
-            if (!dataParsed.success) {
-                console.error("Failed to parse AI response:", dataParsed.error);
-                return;
-            }
-
-            setLastAIResponseID(dataParsed.data.previous_response_id);
-
-            setMessages((prevMessages) => [
-                ...prevMessages,
-
-                {
-                    id: dataParsed.data.previous_response_id,
-                    text: dataParsed.data.responseToUser,
-                    sender: "ai",
-                },
-            ]);
-        } catch (error) {
-            console.error("Failed to send message", error);
+        if (res.success === false) {
             setMessages((prevMessages) => [
                 ...prevMessages,
                 responseFailureMessage,
             ]);
+
+            return;
+        }
+
+        setLastAIResponseID(res.data.previous_response_id);
+
+        setMessages((prevMessages) => [
+            ...prevMessages,
+
+            {
+                id: res.data.previous_response_id,
+                text: res.data.responseToUser,
+                sender: "ai",
+            },
+        ]);
+    };
+
+    const submitEnabled =
+        inputValue.trim() !== "" && inputValue.length <= MAX_CHARACTERS;
+
+    const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!submitEnabled) {
+            return;
+        }
+
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault(); // Prevent default form submission
+            handleUserMessage();
         }
     };
 
@@ -178,15 +168,28 @@ export function ChatBox() {
                 gap={2}
                 bgColor={"gray.100"}
             >
-                <Input
-                    placeholder="Type your message..."
+                <Box width={"100%"}>
+                    <Input
+                        placeholder="Type your message..."
+                        borderRadius="full"
+                        paddingX={10}
+                        onKeyDown={handleEnter}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        color="gray.600"
+                    />
+                    {inputValue.length > MAX_CHARACTERS && (
+                        <Text color="red.500" fontSize="xs">
+                            Message is too long
+                        </Text>
+                    )}
+                </Box>
+
+                <Button
+                    onClick={handleUserMessage}
                     borderRadius="full"
-                    paddingX={10}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    color="gray.600"
-                />
-                <Button onClick={sendUserMessage} borderRadius="full">
+                    disabled={!submitEnabled}
+                >
                     Send
                 </Button>
             </Flex>
