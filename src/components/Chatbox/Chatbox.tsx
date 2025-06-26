@@ -1,9 +1,9 @@
 "use client";
-import { MAX_CHARACTERS } from "@/app/utils/constants";
+import { MAX_AI_RESPONSES, MAX_CHARACTERS } from "@/app/utils/constants";
 import sendUserMessage from "@/app/utils/sendUserMessage";
 import { AIResponseID, UserRequest } from "@/types";
-import { Box, Button, Flex, Input, Text } from "@chakra-ui/react";
-import { useState } from "react";
+import { Box, Button, Flex, Input, Skeleton, Text } from "@chakra-ui/react";
+import { useMemo, useState } from "react";
 import { v4 } from "uuid";
 import AIMessage from "./AIMessage";
 import UserMessage from "./UserMessage";
@@ -37,12 +37,20 @@ const initialMessages: Message[] = [
 export function ChatBox() {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
 
+    const totalAIResponses = useMemo(() => {
+        return messages.filter((msg) => msg.sender === "ai").length;
+    }, [messages]);
+
     const [inputValue, setInputValue] = useState("");
+
+    const [responseLoading, setResponseLoading] = useState(false);
 
     const [lastAIResponseID, setLastAIResponseID] =
         useState<AIResponseID | null>(null);
 
     const handleUserMessage = async () => {
+        setResponseLoading(true);
+
         const body: UserRequest = {
             message: inputValue,
             previous_response_id: lastAIResponseID,
@@ -60,6 +68,8 @@ export function ChatBox() {
         ]);
 
         const res = await sendUserMessage(body);
+
+        setResponseLoading(false);
 
         if (res.success === false) {
             setMessages((prevMessages) => [
@@ -158,6 +168,16 @@ export function ChatBox() {
                             return null;
                     }
                 })}
+                {responseLoading && (
+                    <Flex gap={3}>
+                        <Box w={8} h={8} borderRadius="full" bg="gray.400" />
+                        <Skeleton
+                            height="40px"
+                            width="200px"
+                            borderRadius="lg"
+                        />
+                    </Flex>
+                )}
             </Flex>
 
             {/* Input Area */}
@@ -177,10 +197,16 @@ export function ChatBox() {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         color="gray.600"
+                        disabled={totalAIResponses >= MAX_AI_RESPONSES}
                     />
                     {inputValue.length > MAX_CHARACTERS && (
                         <Text color="red.500" fontSize="xs">
                             Message is too long
+                        </Text>
+                    )}
+                    {totalAIResponses >= MAX_AI_RESPONSES && (
+                        <Text color="red.500" fontSize="xs">
+                            Sorry - you&#39;ve reached the chat limit.
                         </Text>
                     )}
                 </Box>
