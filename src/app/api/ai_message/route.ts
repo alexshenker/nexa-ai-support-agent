@@ -1,8 +1,9 @@
 import ai_client, { MODEL } from "@/app/ai/ai";
+import { MAX_CHARACTERS } from "@/app/utils/constants";
 import handleTicketCreation from "@/app/utils/handleTicketCreation";
 import {
     AIResponse,
-    PreviousResponseID,
+    AIResponseID,
     ResponseToUser,
     UserData,
     UserRequest,
@@ -20,18 +21,19 @@ const INSTRUCTIONS = `You must collect the following information from each user:
 You must do so by asking the user a series of questions, collecting one piece of information at a time.
 After the user provides a description, you must create a fitting category for the issue and return it in the outlined object below.
 If the user provides an invalid answer, you must acknowledge their message if you determine that you should, and then ask them to answer the question until all the information has been provided.
+NOTE: Its possible that the user will provide information out of order - you must be able to handle this and ask for the missing information politely.
 Once you've collected all the information, you must thank the user with the first and last names they have provided, and assure them the ticket will be handled shortly.
 Your response should always be a JSON object with the following structure:
 {
   responseToUser: string,
   dataCollected: {
-    "firstName": string | null,
-    "lastName": string | null,
-    "issueDescription": string | null,
-    "category": string | null
+    "firstName": string,
+    "lastName": string,
+    "issueDescription": string,
+    "category": string
   }
 }
-Each value should be a string after it has been provided, and null if it has not been provided yet.
+If a value has not been collected yet, it should be returned as an empty string.
 Finally: The fewer tokens you use, the better. But ensure your responses are complete.  
 `;
 
@@ -56,6 +58,24 @@ export async function POST(request: NextRequest) {
 
     const { message, previous_response_id } = bodyParsed.data;
 
+    if (message.trim() === "") {
+        return Response.json(
+            {
+                error: "Message cannot be empty",
+            },
+            { status: 400 }
+        );
+    }
+
+    if (message.length > MAX_CHARACTERS) {
+        return Response.json(
+            {
+                error: `Message exceeds maximum length of ${MAX_CHARACTERS} characters`,
+            },
+            { status: 400 }
+        );
+    }
+
     const response = await ai_client.responses.create({
         model: MODEL,
         input: message,
@@ -67,7 +87,9 @@ export async function POST(request: NextRequest) {
         },
     });
 
-    const parsedOutputText = AIResponse.safeParse(response.output_text);
+    const responseObject = JSON.parse(response.output_text);
+
+    const parsedOutputText = AIResponse.safeParse(responseObject);
 
     if (!parsedOutputText.success) {
         console.error("Failed to parse output text:", parsedOutputText.error);
@@ -96,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     const responseToUser: ResponseToUser = {
         responseToUser: parsedOutputText.data.responseToUser,
-        previous_response_id: response.id as PreviousResponseID,
+        previous_response_id: response.id as AIResponseID,
     };
 
     return Response.json(responseToUser);

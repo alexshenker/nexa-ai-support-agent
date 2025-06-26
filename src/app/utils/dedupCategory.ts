@@ -40,7 +40,13 @@ const dedupCategory = async (
         },
     });
 
-    const parsedOutputText = CategoryResponse.safeParse(response.output_text);
+    const responseObject = JSON.parse(
+        response.output_text.replace(/^`|`$/g, "")
+    );
+
+    const parsedOutputText = CategoryResponse.safeParse(
+        responseObject.output_text
+    );
     if (!parsedOutputText.success) {
         console.error("Failed to parse AI response");
         return { categoryName: categoryCandidate, isNew: true };

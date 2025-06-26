@@ -1,21 +1,22 @@
 import { z } from "zod";
 
-export type PreviousResponseID = string & { __brand: "Previous_Response_ID" };
-export const PreviousResponseID = z.custom<PreviousResponseID>();
+export type AIResponseID = string & { __brand: "AI_Response_ID" };
+export const AIResponseID = z.custom<AIResponseID>();
 
 export const UserData = z.object({
-    firstName: z.string().nullable(),
-    lastName: z.string().nullable(),
-    issueDescription: z.string().nullable(),
-    category: z.string().nullable(),
+    firstName: z.string(),
+    lastName: z.string(),
+    issueDescription: z.string(),
+    category: z.string(),
 });
 
 export type UserData = z.infer<typeof UserData>;
 
 export const UserRequest = z.object({
     message: z.string(),
-    previous_response_id: PreviousResponseID,
+    previous_response_id: AIResponseID.nullable(),
 });
+export type UserRequest = z.infer<typeof UserRequest>;
 
 export const AIResponse = z.object({
     responseToUser: z.string(),
@@ -26,7 +27,7 @@ export type AIResponse = z.infer<typeof AIResponse>;
 
 export const ResponseToUser = z.object({
     responseToUser: z.string(),
-    previous_response_id: PreviousResponseID,
+    previous_response_id: AIResponseID,
 });
 
 export type ResponseToUser = z.infer<typeof ResponseToUser>;
