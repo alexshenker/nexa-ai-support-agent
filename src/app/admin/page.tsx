@@ -1,46 +1,54 @@
 "use client";
+import { Ticket } from "@/types";
 import getTickets from "@/utils/getTickets";
 import { Box, Flex, Input, Text } from "@chakra-ui/react";
+import { format, parseISO } from "date-fns";
+import { orderBy } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 
 // Types
-type TicketStatus = "open" | "closed";
 type SortDirection = "asc" | "desc";
-type SortField =
-    | "id"
-    | "user_first"
-    | "user_last"
-    | "category"
-    | "description"
-    | "status"
-    | "created_at";
 
-interface Ticket {
-    id: number;
-    user_first: string;
-    user_last: string;
-    category: string;
-    description: string;
-    status: TicketStatus;
-    created_at: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const columns = [
+    "id",
+    "user_first",
+    "user_last",
+    "category",
+    "description",
+    "status",
+    "created_at",
+] as const;
+
+type Column = (typeof columns)[number];
 
 interface SortConfig {
-    field: SortField | null;
+    field: Column;
     direction: SortDirection;
 }
+
+/**
+ * Normalize for sort & filter
+ */
+const normalize = (val: string | number): string => {
+    if (typeof val === "number") {
+        return val.toString();
+    }
+
+    return val.toLowerCase().trim();
+};
 
 const Admin = () => {
     const [tickets, setTickets] = useState<Ticket[]>([]);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [sortConfig, setSortConfig] = useState<SortConfig>({
-        field: null,
+        field: "id",
         direction: "asc",
     });
 
     // Handle column header click for sorting
-    const handleSort = (field: SortField) => {
+    const handleSort = (field: Column) => {
         setSortConfig((prev) => ({
             field,
             direction:
@@ -51,6 +59,7 @@ const Admin = () => {
     };
 
     useEffect(() => {
+        //@TODO: Change to hook
         if (tickets.length > 0) {
             return;
         }
@@ -62,64 +71,44 @@ const Admin = () => {
         })();
     }, [tickets.length]);
 
-    // Filter and sort tickets
-    const processedTickets = useMemo(() => {
-        // First, filter based on search
+    const filteredTickets = useMemo(() => {
         const filtered = tickets.filter((ticket) => {
-            const searchLower = searchTerm.toLowerCase();
+            const searchNormalized = normalize(searchTerm);
+
+            const { id, user_first, user_last, category, description, status } =
+                ticket;
+
             return (
-                ticket.id.toString().includes(searchLower) ||
-                ticket.user_first.toLowerCase().includes(searchLower) ||
-                ticket.user_last.toLowerCase().includes(searchLower) ||
-                ticket.category.toLowerCase().includes(searchLower) ||
-                ticket.description.toLowerCase().includes(searchLower) ||
-                ticket.status.toLowerCase().includes(searchLower)
+                normalize(id).includes(searchNormalized) ||
+                normalize(user_first).includes(searchNormalized) ||
+                normalize(user_last).includes(searchNormalized) ||
+                normalize(category).includes(searchNormalized) ||
+                normalize(description).includes(searchNormalized) ||
+                normalize(status).includes(searchNormalized)
             );
         });
 
-        // Then sort if a field is selected
-        if (sortConfig.field) {
-            filtered.sort((a, b) => {
-                const aVal = a[sortConfig.field!];
-                const bVal = b[sortConfig.field!];
+        return filtered;
+    }, [tickets, searchTerm]);
 
-                if (sortConfig.field === "id") {
-                    return sortConfig.direction === "asc"
-                        ? Number(aVal) - Number(bVal)
-                        : Number(bVal) - Number(aVal);
-                }
-
-                if (sortConfig.field === "created_at") {
-                    return sortConfig.direction === "asc"
-                        ? new Date(aVal as string).getTime() -
-                              new Date(bVal as string).getTime()
-                        : new Date(bVal as string).getTime() -
-                              new Date(aVal as string).getTime();
-                }
-
-                const aStr = String(aVal).toLowerCase();
-                const bStr = String(bVal).toLowerCase();
-
-                if (sortConfig.direction === "asc") {
-                    return aStr < bStr ? -1 : aStr > bStr ? 1 : 0;
-                } else {
-                    return aStr > bStr ? -1 : aStr < bStr ? 1 : 0;
-                }
-            });
+    const sortedTickets = useMemo(() => {
+        if (sortConfig === null) {
+            return filteredTickets;
         }
 
-        return filtered;
-    }, [tickets, searchTerm, sortConfig]);
+        return orderBy(
+            filteredTickets,
+            (ticket) => {
+                const val = ticket[sortConfig.field!];
 
-    // Format date for display
+                return typeof val === "string" ? normalize(val) : val;
+            },
+            [sortConfig.direction]
+        );
+    }, [filteredTickets, sortConfig]);
+
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
+        return format(parseISO(dateString), "MMM d, yyyy h:mm a");
     };
 
     return (
@@ -255,7 +244,7 @@ const Admin = () => {
                         </Box>
                     </Box>
                     <Box as="tbody">
-                        {processedTickets.length === 0 ? (
+                        {sortedTickets.length === 0 ? (
                             <Box as="tr">
                                 <Box
                                     as="td"
@@ -271,7 +260,7 @@ const Admin = () => {
                                 </Box>
                             </Box>
                         ) : (
-                            processedTickets.map((ticket) => (
+                            sortedTickets.map((ticket) => (
                                 <Box
                                     as="tr"
                                     key={ticket.id}
@@ -372,7 +361,7 @@ const Admin = () => {
 
             {/* Results count */}
             <Text mt={4} fontSize="sm" color="#718096">
-                Showing {processedTickets.length} of {tickets.length} tickets
+                Showing {sortedTickets.length} of {tickets.length} tickets
             </Text>
         </Box>
     );
