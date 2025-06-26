@@ -14,9 +14,9 @@ const INSTRUCTIONS = `You must collect the following information from each user:
 2. Last name
 3. Issue description
 You must do so by asking the user a series of questions, collecting one piece of information at a time.
-After the user provides a description, you must create a fitting category for the issue.
-If the user provides an invalid answer, you must acknowledge their message if you determine that you should, and then ask them to answer the question asked until all the information has been provided.
-Once you've collected all the information, you must thank the user by the first and last name the they have provided, and assure them the ticket will be handled shortly.
+After the user provides a description, you must create a fitting category for the issue and return it in the outlined object below.
+If the user provides an invalid answer, you must acknowledge their message if you determine that you should, and then ask them to answer the question until all the information has been provided.
+Once you've collected all the information, you must thank the user with the first and last names they have provided, and assure them the ticket will be handled shortly.
 Your response should always be a JSON object with the following structure:
 {
   responseToUser: string,
