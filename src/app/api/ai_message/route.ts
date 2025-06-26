@@ -1,10 +1,14 @@
 import ai_client, { MODEL } from "@/app/ai/ai";
-import { addCategory, createTicket } from "@/app/db/db";
-import dedupCategory from "@/app/utils/dedupCategory";
-import { PreviousResponseID } from "@/types";
+import handleTicketCreation from "@/app/utils/handleTicketCreation";
+import {
+    AIResponse,
+    PreviousResponseID,
+    ResponseToUser,
+    UserData,
+    UserRequest,
+} from "@/types";
 import { NextRequest } from "next/server";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
-import { z } from "zod";
 
 const ROLE =
     "You are an assistant that interacts with users via a chat interface. Your goal is to guide users through a series of questions that gather information needed to open a support ticket. There is no specific product involved. This is a general support ticket system. ";
@@ -30,31 +34,6 @@ Your response should always be a JSON object with the following structure:
 Each value should be a string after it has been provided, and null if it has not been provided yet.
 Finally: The fewer tokens you use, the better. But ensure your responses are complete.  
 `;
-
-const UserData = z.object({
-    firstName: z.string().nullable(),
-    lastName: z.string().nullable(),
-    issueDescription: z.string().nullable(),
-    category: z.string().nullable(),
-});
-type UserData = z.infer<typeof UserData>;
-
-const UserRequest = z.object({
-    message: z.string(),
-    previous_response_id: PreviousResponseID,
-});
-
-const AIResponse = z.object({
-    responseToUser: z.string(),
-    dataCollected: UserData,
-});
-type AIResponse = z.infer<typeof AIResponse>;
-
-export const ResponseToUser = z.object({
-    responseToUser: z.string(),
-    previous_response_id: PreviousResponseID,
-});
-export type ResponseToUser = z.infer<typeof ResponseToUser>;
 
 const allDataCollected = (data: UserData): boolean => {
     const values = Object.values(data);
@@ -102,22 +81,17 @@ export async function POST(request: NextRequest) {
     }
 
     if (allDataCollected(parsedOutputText.data.dataCollected)) {
-        //Handle category deduplication and ticket creation
-        const categoryDeduped = await dedupCategory(
-            parsedOutputText.data.dataCollected.category ?? ""
-        );
-
-        if (categoryDeduped.isNew) {
-            addCategory(categoryDeduped.categoryName);
+        try {
+            await handleTicketCreation(parsedOutputText.data.dataCollected);
+        } catch (error) {
+            console.error("Error handling ticket creation:", error);
+            return Response.json(
+                {
+                    error: "Failed to handle ticket creation",
+                },
+                { status: 500 }
+            );
         }
-
-        createTicket({
-            user_first: parsedOutputText.data.dataCollected.firstName ?? "",
-            user_last: parsedOutputText.data.dataCollected.lastName ?? "",
-            category: categoryDeduped.categoryName,
-            description:
-                parsedOutputText.data.dataCollected.issueDescription ?? "",
-        });
     }
 
     const responseToUser: ResponseToUser = {

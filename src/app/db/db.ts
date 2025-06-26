@@ -34,7 +34,7 @@ const Ticket = z.object({
     status: TicketStatus,
 });
 
-export type Ticket = z.infer<typeof Ticket>;
+type Ticket = z.infer<typeof Ticket>;
 
 export function createTicket(ticket: OmitMod<Ticket, "id" | "status">): void {
     const stmt = db.prepare(
