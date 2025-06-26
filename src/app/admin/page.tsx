@@ -72,9 +72,13 @@ const Admin = () => {
     }, [tickets.length]);
 
     const filteredTickets = useMemo(() => {
-        const filtered = tickets.filter((ticket) => {
-            const searchNormalized = normalize(searchTerm);
+        const searchNormalized = normalize(searchTerm);
 
+        if (searchNormalized === "") {
+            return tickets;
+        }
+
+        const filtered = tickets.filter((ticket) => {
             const { id, user_first, user_last, category, description, status } =
                 ticket;
 
