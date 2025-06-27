@@ -1,6 +1,7 @@
 import { Ticket, TicketId } from "@/types";
 import Database from "better-sqlite3";
 import { z } from "zod";
+import sample_categories from "./sample_categories";
 import sample_tickets from "./sample_tickets";
 const db = new Database("demo.db");
 
@@ -22,11 +23,13 @@ db.exec(`
 `);
 
 //Add from samples
-const count = db.prepare("SELECT COUNT(*) as count FROM tickets").get() as {
+const ticketCount = db
+    .prepare("SELECT COUNT(*) as count FROM tickets")
+    .get() as {
     count: number;
 };
 
-if (count.count === 0) {
+if (ticketCount.count === 0) {
     const stmt = db.prepare(
         "INSERT INTO tickets (user_first, user_last, category, description, status, created_at) VALUES (?, ?, ?, ?, ?, ?)"
     );
@@ -40,6 +43,20 @@ if (count.count === 0) {
             ticket.status,
             ticket.created_at
         );
+    });
+}
+
+const categoryCount = db
+    .prepare("SELECT COUNT(*) as count FROM categories")
+    .get() as {
+    count: number;
+};
+
+if (categoryCount.count === 0) {
+    const stmt = db.prepare("INSERT INTO categories (name) VALUES (?)");
+
+    sample_categories.forEach((category) => {
+        stmt.run(category);
     });
 }
 
