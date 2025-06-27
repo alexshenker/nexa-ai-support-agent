@@ -225,7 +225,7 @@ export function ChatBox() {
                         onChange={(e) => setInputValue(e.target.value)}
                         color="gray.600"
                         disabled={
-                            totalAIResponses >= MAX_AI_RESPONSES &&
+                            totalAIResponses >= MAX_AI_RESPONSES ||
                             ticketID !== null
                         }
                     />
