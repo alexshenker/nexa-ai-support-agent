@@ -110,6 +110,7 @@ export async function POST(request: NextRequest) {
     let ticketId: TicketId | null = null;
 
     if (allDataCollected(parsedOutputText.data.dataCollected)) {
+        // We have what we need to create a ticket
         try {
             ticketId = await handleTicketCreation(
                 parsedOutputText.data.dataCollected

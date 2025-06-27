@@ -52,54 +52,6 @@ const sample_tickets: Ticket[] = [
         status: "open",
         created_at: "2024-12-01 11:30:22",
     },
-    {
-        id: 6 as TicketId,
-        user_first: "Robert",
-        user_last: "Martinez",
-        category: categoryTable["Account Issues"],
-        description:
-            "My account was suspended without any warning or explanation.",
-        status: "closed",
-        created_at: "2024-11-29 08:45:10",
-    },
-    {
-        id: 7 as TicketId,
-        user_first: "Jennifer",
-        user_last: "Taylor",
-        category: categoryTable["Data Issues"],
-        description: "Some of my saved data disappeared after the last update.",
-        status: "open",
-        created_at: "2024-12-01 13:10:55",
-    },
-    {
-        id: 8 as TicketId,
-        user_first: "David",
-        user_last: "Brown",
-        category: categoryTable["Performance"],
-        description: "The mobile app crashes whenever I try to upload a photo.",
-        status: "open",
-        created_at: "2024-11-30 17:25:33",
-    },
-    {
-        id: 9 as TicketId,
-        user_first: "Maria",
-        user_last: "Garcia",
-        category: categoryTable["Billing"],
-        description:
-            "I need to update my payment method but can't find the option in settings.",
-        status: "closed",
-        created_at: "2024-11-29 12:00:00",
-    },
-    {
-        id: 10 as TicketId,
-        user_first: "Kevin",
-        user_last: "Lee",
-        category: categoryTable["Security"],
-        description:
-            "I received a suspicious email claiming to be from your support team. Is this legitimate?",
-        status: "open",
-        created_at: "2024-12-01 15:45:18",
-    },
 ];
 
 export default sample_tickets;

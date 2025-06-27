@@ -73,6 +73,8 @@ const Layout = ({ children }: PropsWithChildren) => {
     };
 
     const filteredTickets = useMemo(() => {
+        //In future, we can return the full hook response to each memo response.
+        //that would be a bit cleaner than checking loading status in tickets itself.
         if (
             tickets.isLoading ||
             tickets.isError ||
@@ -146,6 +148,7 @@ const Layout = ({ children }: PropsWithChildren) => {
                 </Flex>
             </Stack>
             <Stack width="full" gap="5">
+                {/* In the future... reusable table component */}
                 <Table.Root size="sm">
                     <Table.Header>
                         <Table.Row>

@@ -38,7 +38,7 @@ export async function PUT(
             }
         );
     }
-
+    //In future... validate that the ticket even exists
     updateTicketStatus(ticket_id, bodyParsed.data.status);
 
     return Response.json({ status: 200 });
