@@ -30,7 +30,7 @@ export default function NavButtons() {
                 colorPalette={"purple"}
                 width={100}
                 onClick={() => router.push("/")}
-                disabled={path.includes("/")}
+                disabled={path === "/"}
             >
                 Home
             </Button>
