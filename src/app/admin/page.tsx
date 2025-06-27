@@ -2,15 +2,14 @@
 import NavButtons from "@/components/Nav/Nav";
 import { Ticket } from "@/types";
 import getTickets from "@/utils/getTickets";
-import { Box, Flex, Input, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Input, Stack, Table, Text } from "@chakra-ui/react";
 import { format, parseISO } from "date-fns";
-import { orderBy } from "lodash";
+import { orderBy, startCase } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 
 // Types
 type SortDirection = "asc" | "desc";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const columns = [
     "id",
     "user_first",
@@ -27,6 +26,10 @@ interface SortConfig {
     field: Column;
     direction: SortDirection;
 }
+
+const formatDate = (dateString: string) => {
+    return format(parseISO(dateString), "MMM d, yyyy h:mm a");
+};
 
 /**
  * Normalize for sort & filter
@@ -112,10 +115,6 @@ const Admin = () => {
         );
     }, [filteredTickets, sortConfig]);
 
-    const formatDate = (dateString: string) => {
-        return format(parseISO(dateString), "MMM d, yyyy h:mm a");
-    };
-
     return (
         <Box padding={20}>
             <Stack>
@@ -132,244 +131,53 @@ const Admin = () => {
                     />
                 </Flex>
             </Stack>
-
-            {/* Table */}
-            <Box overflowX="auto" border="1px solid #E2E8F0" borderRadius="lg">
-                <Box as="table" width="100%" borderCollapse="collapse">
-                    <Box as="thead" bg="#F7FAFC">
-                        <Box as="tr">
-                            <Box
-                                as="th"
-                                p={3}
-                                textAlign="left"
-                                fontWeight="bold"
-                                borderBottom="1px solid #E2E8F0"
-                                cursor="pointer"
-                                onClick={() => handleSort("id")}
-                                //   _hover={{ bg: "#EDF2F7" }}
-                            >
-                                ID{" "}
-                                {sortConfig.field === "id" &&
-                                    (sortConfig.direction === "asc"
-                                        ? "↑"
-                                        : "↓")}
-                            </Box>
-                            <Box
-                                as="th"
-                                p={3}
-                                textAlign="left"
-                                fontWeight="bold"
-                                borderBottom="1px solid #E2E8F0"
-                                cursor="pointer"
-                                onClick={() => handleSort("user_first")}
-                                //  _hover={{ bg: "#EDF2F7" }}
-                            >
-                                First Name{" "}
-                                {sortConfig.field === "user_first" &&
-                                    (sortConfig.direction === "asc"
-                                        ? "↑"
-                                        : "↓")}
-                            </Box>
-                            <Box
-                                as="th"
-                                p={3}
-                                textAlign="left"
-                                fontWeight="bold"
-                                borderBottom="1px solid #E2E8F0"
-                                cursor="pointer"
-                                onClick={() => handleSort("user_last")}
-                                //  _hover={{ bg: "#EDF2F7" }}
-                            >
-                                Last Name{" "}
-                                {sortConfig.field === "user_last" &&
-                                    (sortConfig.direction === "asc"
-                                        ? "↑"
-                                        : "↓")}
-                            </Box>
-                            <Box
-                                as="th"
-                                p={3}
-                                textAlign="left"
-                                fontWeight="bold"
-                                borderBottom="1px solid #E2E8F0"
-                                cursor="pointer"
-                                onClick={() => handleSort("category")}
-                                //  _hover={{ bg: "#EDF2F7" }}
-                            >
-                                Category{" "}
-                                {sortConfig.field === "category" &&
-                                    (sortConfig.direction === "asc"
-                                        ? "↑"
-                                        : "↓")}
-                            </Box>
-                            <Box
-                                as="th"
-                                p={3}
-                                textAlign="left"
-                                fontWeight="bold"
-                                borderBottom="1px solid #E2E8F0"
-                                cursor="pointer"
-                                onClick={() => handleSort("description")}
-                                // _hover={{ bg: "#EDF2F7" }}
-                            >
-                                Description{" "}
-                                {sortConfig.field === "description" &&
-                                    (sortConfig.direction === "asc"
-                                        ? "↑"
-                                        : "↓")}
-                            </Box>
-                            <Box
-                                as="th"
-                                p={3}
-                                textAlign="left"
-                                fontWeight="bold"
-                                borderBottom="1px solid #E2E8F0"
-                                cursor="pointer"
-                                onClick={() => handleSort("status")}
-                                // _hover={{ bg: "#EDF2F7" }}
-                            >
-                                Status{" "}
-                                {sortConfig.field === "status" &&
-                                    (sortConfig.direction === "asc"
-                                        ? "↑"
-                                        : "↓")}
-                            </Box>
-                            <Box
-                                as="th"
-                                p={3}
-                                textAlign="left"
-                                fontWeight="bold"
-                                borderBottom="1px solid #E2E8F0"
-                                cursor="pointer"
-                                onClick={() => handleSort("created_at")}
-                                // _hover={{ bg: "#EDF2F7" }}
-                            >
-                                Date Created{" "}
-                                {sortConfig.field === "created_at" &&
-                                    (sortConfig.direction === "asc"
-                                        ? "↑"
-                                        : "↓")}
-                            </Box>
-                        </Box>
-                    </Box>
-                    <Box as="tbody">
-                        {sortedTickets.length === 0 ? (
-                            <Box as="tr">
-                                <Box
-                                    as="td"
-                                    columnSpan={"7"}
-                                    textAlign="center"
-                                    p={8}
-                                >
-                                    <Text color="gray.500">
-                                        {searchTerm
-                                            ? "No tickets found matching your search"
-                                            : "No tickets available"}
-                                    </Text>
-                                </Box>
-                            </Box>
-                        ) : (
-                            sortedTickets.map((ticket) => (
-                                <Box
-                                    as="tr"
-                                    key={ticket.id}
-                                    //  _hover={{ bg: "#F7FAFC" }}
-                                    cursor="pointer"
-                                >
-                                    <Box
-                                        as="td"
-                                        p={3}
-                                        borderBottom="1px solid #E2E8F0"
-                                        fontWeight="medium"
+            <Stack width="full" gap="5">
+                <Table.Root size="sm">
+                    <Table.Header>
+                        <Table.Row>
+                            {columns.map((col) => {
+                                return (
+                                    <Table.ColumnHeader
+                                        key={col}
+                                        onClick={() => handleSort(col)}
+                                        cursor={"pointer"}
                                     >
-                                        #{ticket.id}
-                                    </Box>
-                                    <Box
-                                        as="td"
-                                        p={3}
-                                        borderBottom="1px solid #E2E8F0"
-                                    >
-                                        {ticket.user_first}
-                                    </Box>
-                                    <Box
-                                        as="td"
-                                        p={3}
-                                        borderBottom="1px solid #E2E8F0"
-                                    >
-                                        {ticket.user_last}
-                                    </Box>
-                                    <Box
-                                        as="td"
-                                        p={3}
-                                        borderBottom="1px solid #E2E8F0"
-                                    >
-                                        <Box
-                                            display="inline-block"
-                                            px={2}
-                                            py={1}
-                                            bg="#E9D8FD"
-                                            color="#6B46C1"
-                                            fontSize="sm"
-                                            borderRadius="md"
-                                        >
-                                            {ticket.category}
-                                        </Box>
-                                    </Box>
-                                    <Box
-                                        as="td"
-                                        p={3}
-                                        borderBottom="1px solid #E2E8F0"
-                                        maxW="250px"
-                                        overflow="hidden"
-                                        textOverflow="ellipsis"
-                                        whiteSpace="nowrap"
-                                        title={ticket.description}
-                                    >
+                                        {startCase(col)}
+                                        {sortConfig.field === col && (
+                                            <Text ml={2} as="span">
+                                                {sortConfig.direction === "asc"
+                                                    ? "↑"
+                                                    : "↓"}
+                                            </Text>
+                                        )}
+                                    </Table.ColumnHeader>
+                                );
+                            })}
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        {sortedTickets.map((ticket) => {
+                            return (
+                                <Table.Row key={ticket.id}>
+                                    <Table.Cell>{"#" + ticket.id}</Table.Cell>
+                                    <Table.Cell>{ticket.user_first}</Table.Cell>
+                                    <Table.Cell>{ticket.user_last}</Table.Cell>
+                                    <Table.Cell>{ticket.category}</Table.Cell>
+                                    <Table.Cell>
                                         {ticket.description}
-                                    </Box>
-                                    <Box
-                                        as="td"
-                                        p={3}
-                                        borderBottom="1px solid #E2E8F0"
-                                    >
-                                        <Box
-                                            display="inline-block"
-                                            px={2}
-                                            py={1}
-                                            bg={
-                                                ticket.status === "open"
-                                                    ? "#C6F6D5"
-                                                    : "#E2E8F0"
-                                            }
-                                            color={
-                                                ticket.status === "open"
-                                                    ? "#22543D"
-                                                    : "#2D3748"
-                                            }
-                                            fontSize="sm"
-                                            borderRadius="md"
-                                        >
-                                            {ticket.status}
-                                        </Box>
-                                    </Box>
-                                    <Box
-                                        as="td"
-                                        p={3}
-                                        borderBottom="1px solid #E2E8F0"
-                                        fontSize="sm"
-                                        color="#718096"
-                                    >
+                                    </Table.Cell>
+                                    <Table.Cell>{ticket.status}</Table.Cell>
+                                    <Table.Cell>
                                         {formatDate(ticket.created_at)}
-                                    </Box>
-                                </Box>
-                            ))
-                        )}
-                    </Box>
-                </Box>
-            </Box>
-
+                                    </Table.Cell>
+                                </Table.Row>
+                            );
+                        })}
+                    </Table.Body>
+                </Table.Root>
+            </Stack>
             {/* Results count */}
-            <Text mt={4} fontSize="sm" color="#718096">
+            <Text mt={4} fontSize="sm" color="gray.500">
                 Showing {sortedTickets.length} of {tickets.length} tickets
             </Text>
         </Box>
