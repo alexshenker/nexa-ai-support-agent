@@ -3,11 +3,7 @@
 Welcome to the AI Support Agent.
 The agent will assist you in opening a ticket for any problem you may have!
 
-## Demo
-
-Try the live application: <u>[AI Support Agent](https://nexa-ai-support-agent.vercel.app/)</u>
-
-## Local Development
+## Local Deployment
 
 1. Create a `.env` file in the project root directory
 
