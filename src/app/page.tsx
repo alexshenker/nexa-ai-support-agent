@@ -1,10 +1,11 @@
 "use client";
+
 import NavButtons from "@/components/Nav/Nav";
 import { useColorMode } from "@/components/ui/color-mode";
-import { Box, IconButton, Stack } from "@chakra-ui/react";
+import { Box, ClientOnly, IconButton, Skeleton, Stack } from "@chakra-ui/react";
 import { LuMoon, LuSun } from "react-icons/lu";
 
-const Dashboard = (): React.JSX.Element => {
+const Home = (): React.JSX.Element => {
     const { toggleColorMode, colorMode } = useColorMode();
 
     return (
@@ -16,17 +17,19 @@ const Dashboard = (): React.JSX.Element => {
             height="100vh"
         >
             <Stack>
-                <IconButton
-                    onClick={toggleColorMode}
-                    variant="outline"
-                    size="sm"
-                >
-                    {colorMode === "light" ? <LuSun /> : <LuMoon />}
-                </IconButton>
+                <ClientOnly fallback={<Skeleton width="100%" height="36px" />}>
+                    <IconButton
+                        onClick={toggleColorMode}
+                        variant="outline"
+                        size="sm"
+                    >
+                        {colorMode === "light" ? <LuSun /> : <LuMoon />}
+                    </IconButton>
+                </ClientOnly>
                 <NavButtons />
             </Stack>
         </Box>
     );
 };
 
-export default Dashboard;
+export default Home;

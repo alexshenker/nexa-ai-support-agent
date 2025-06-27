@@ -26,6 +26,14 @@ export default function NavButtons() {
             >
                 Admin
             </Button>
+            <Button
+                colorPalette={"purple"}
+                width={100}
+                onClick={() => router.push("/")}
+                disabled={path.includes("/")}
+            >
+                Home
+            </Button>
         </ButtonGroup>
     );
 }
