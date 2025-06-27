@@ -1,6 +1,7 @@
 "use client";
 
 import useTicket from "@/lib/useTicket";
+import useUpdateTicketStatus from "@/lib/useUpdateTicketStatus";
 import { TicketId } from "@/types";
 import {
     Button,
@@ -10,6 +11,7 @@ import {
     Stack,
     Text,
 } from "@chakra-ui/react";
+import { isNil } from "lodash";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -23,6 +25,8 @@ const Ticket = (): React.JSX.Element => {
     const ticket = useTicket(Number(ticket_id) as TicketId);
 
     const router = useRouter();
+
+    const callUpdateTicketStatus = useUpdateTicketStatus();
 
     const [open, setOpen] = useState(true);
 
@@ -39,7 +43,7 @@ const Ticket = (): React.JSX.Element => {
                     <Drawer.Header>
                         <Drawer.Title>
                             {ticket.isLoading ? (
-                                <Skeleton />
+                                <Skeleton width={20} height={6} />
                             ) : (
                                 `Ticket #${ticket.data?.id ?? " Not Found"}`
                             )}
@@ -47,7 +51,7 @@ const Ticket = (): React.JSX.Element => {
                     </Drawer.Header>
                     <Drawer.Body>
                         {ticket.isLoading ? (
-                            <Skeleton boxSize={"10"} />
+                            <Skeleton boxSize={200} />
                         ) : ticket.data ? (
                             <Stack>
                                 <Stack>
@@ -74,6 +78,18 @@ const Ticket = (): React.JSX.Element => {
                                         maxW={"150px"}
                                         colorPalette={"red"}
                                         variant="outline"
+                                        onClick={async () => {
+                                            if (isNil(ticket.data)) {
+                                                throw new Error(
+                                                    "Ticket data is Nil - this should be impossible here"
+                                                );
+                                            }
+
+                                            await callUpdateTicketStatus({
+                                                ticketId: ticket.data.id,
+                                                status: "closed",
+                                            });
+                                        }}
                                     >
                                         Close Ticket
                                     </Button>
@@ -83,6 +99,18 @@ const Ticket = (): React.JSX.Element => {
                                         maxW={"150px"}
                                         variant="outline"
                                         colorPalette={"green"}
+                                        onClick={async () => {
+                                            if (isNil(ticket.data)) {
+                                                throw new Error(
+                                                    "Ticket data is Nil - this should be impossible here"
+                                                );
+                                            }
+
+                                            await callUpdateTicketStatus({
+                                                ticketId: ticket.data.id,
+                                                status: "open",
+                                            });
+                                        }}
                                     >
                                         Reopen Ticket
                                     </Button>

@@ -1,4 +1,4 @@
-import { Ticket, TicketId } from "@/types";
+import { Ticket, TicketId, TicketStatus } from "@/types";
 import Database from "better-sqlite3";
 import { z } from "zod";
 import sample_categories from "./sample_categories";
@@ -62,12 +62,12 @@ if (categoryCount.count === 0) {
 
 export function createTicket(
     ticket: OmitMod<Ticket, "id" | "status" | "created_at">
-): TicketId{
+): TicketId {
     const stmt = db.prepare(
         "INSERT INTO tickets (user_first, user_last, category, description) VALUES (?, ?, ?, ?)"
     );
 
-   const t = stmt.run(
+    const t = stmt.run(
         ticket.user_first,
         ticket.user_last,
         ticket.category,
@@ -100,12 +100,13 @@ export function getTicketById(ticketId: TicketId): Ticket | null {
     return parsedTicket.data;
 }
 
-export function closeTicket(ticketId: TicketId): void {
-    const stmt = db.prepare(
-        "UPDATE tickets SET status = 'closed' WHERE id = ?"
-    );
+export function updateTicketStatus(
+    ticketId: TicketId,
+    status: TicketStatus
+): void {
+    const stmt = db.prepare("UPDATE tickets SET status = ? WHERE id = ?");
 
-    const res = stmt.run(ticketId);
+    const res = stmt.run(status, ticketId);
 
     if (res.changes === 0) {
         console.error(`No ticket found with ID ${ticketId}`);

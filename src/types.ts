@@ -51,3 +51,9 @@ export const Ticket = z.object({
 });
 
 export type Ticket = z.infer<typeof Ticket>;
+
+export const UpdateTicketStatusBody = z.object({
+    status: TicketStatus,
+});
+
+export type UpdateTicketStatusBody = z.infer<typeof UpdateTicketStatusBody>;

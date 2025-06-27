@@ -12,7 +12,3 @@ export async function GET() {
 
     return Response.json(tickets);
 }
-
-export async function POST() {}
-
-export async function DELETE() {}
