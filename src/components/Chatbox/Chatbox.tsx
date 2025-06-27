@@ -3,7 +3,7 @@ import { AIResponseID, UserRequest } from "@/types";
 import { MAX_AI_RESPONSES, MAX_CHARACTERS } from "@/utils/constants";
 import sendUserMessage from "@/utils/sendUserMessage";
 import { Box, Button, Flex, Input, Skeleton, Text } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 } from "uuid";
 import AIMessage from "./AIMessage";
 import UserMessage from "./UserMessage";
@@ -35,6 +35,9 @@ const initialMessages: Message[] = [
 ];
 
 export function ChatBox() {
+    /* Used to scroll to the bottom of the chat box */
+    const chatBoxBottomRef = useRef<HTMLDivElement>(null);
+
     const [messages, setMessages] = useState<Message[]>(initialMessages);
 
     const totalAIResponses = useMemo(() => {
@@ -47,6 +50,14 @@ export function ChatBox() {
 
     const [lastAIResponseID, setLastAIResponseID] =
         useState<AIResponseID | null>(null);
+
+    const scrollToBottom = () => {
+        chatBoxBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const handleUserMessage = async () => {
         setResponseLoading(true);
@@ -178,6 +189,7 @@ export function ChatBox() {
                         />
                     </Flex>
                 )}
+                <div ref={chatBoxBottomRef} />
             </Flex>
 
             {/* Input Area */}

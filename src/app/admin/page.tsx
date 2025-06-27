@@ -125,6 +125,7 @@ const Admin = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     maxW="400px"
                     borderRadius="md"
+                    paddingX={10}
                 />
             </Flex>
 
