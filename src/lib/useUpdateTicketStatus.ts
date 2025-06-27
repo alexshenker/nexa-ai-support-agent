@@ -1,5 +1,5 @@
 import { TicketId, TicketStatus } from "@/types";
-import updateTicketStatus from "@/utils/updateTicketStatus";
+import updateTicketStatus from "@/lib/updateTicketStatus";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getTicketQueryKey } from "./useTicket";
 import { ticketsQueryKey } from "./useTickets";

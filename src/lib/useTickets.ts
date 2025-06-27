@@ -1,4 +1,4 @@
-import getTickets from "@/utils/getTickets";
+import getTickets from "@/lib/getTickets";
 import { useQuery } from "@tanstack/react-query";
 
 export const ticketsQueryKey = ["tickets"];

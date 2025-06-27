@@ -1,5 +1,5 @@
+import getTicket from "@/lib/getTicket";
 import { TicketId } from "@/types";
-import getTicket from "@/utils/getTicket";
 import { useQuery } from "@tanstack/react-query";
 
 export const getTicketQueryKey = (ticketId: TicketId) => ["ticket", ticketId];
