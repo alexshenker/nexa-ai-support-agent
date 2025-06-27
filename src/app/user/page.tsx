@@ -11,7 +11,7 @@ const User = (): React.JSX.Element => {
             justifyContent={"center"}
             alignItems="center"
         >
-            <Stack>
+            <Stack padding={4}>
                 <NavButtons />
                 <ChatBox />
             </Stack>

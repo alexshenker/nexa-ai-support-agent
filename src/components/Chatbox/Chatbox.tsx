@@ -14,6 +14,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 } from "uuid";
 import AIMessage from "./AIMessage";
+import SuppyAvatar from "./SuppyAvatar";
 import UserMessage from "./UserMessage";
 
 type Message =
@@ -37,7 +38,7 @@ const responseFailureMessage: Message = {
 const initialMessages: Message[] = [
     {
         id: v4(),
-        text: "Hello! I am your assistant. How may I help you today?",
+        text: "Hello! I am Suppy! And I am your assistant. How may I help you today?",
         sender: "system",
     },
 ];
@@ -158,10 +159,10 @@ export function ChatBox() {
                 gap={3}
                 bgColor={"gray.100"}
             >
-                <Box w={8} h={8} borderRadius="full" bg="blue.500" />
+                <SuppyAvatar />
                 <Box>
                     <Text fontWeight="bold" color={"gray.600"}>
-                        Support Assistant
+                        Suppy the Support Assistant
                     </Text>
                     <Text fontSize="xs" color="green.600">
                         ● Online
@@ -235,7 +236,7 @@ export function ChatBox() {
                         <Input
                             placeholder="Type your message..."
                             borderRadius="full"
-                            paddingX={10}
+                            paddingX={5}
                             onKeyDown={handleEnter}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}

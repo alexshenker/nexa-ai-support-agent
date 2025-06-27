@@ -1,4 +1,5 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
+import SuppyAvatar from "./SuppyAvatar";
 
 interface Props {
     text: string;
@@ -7,7 +8,7 @@ interface Props {
 const AIMessage = (props: Props): React.JSX.Element => {
     return (
         <Flex gap={3}>
-            <Box w={8} h={8} borderRadius="full" bg="gray.400" />
+            <SuppyAvatar />
             <Box
                 bg="gray.300"
                 px={4}
