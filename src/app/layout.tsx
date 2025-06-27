@@ -1,3 +1,4 @@
+import TanstackProvider from "@/components/TanstackProvider";
 import { Provider as ChakraProvider } from "@/components/ui/ChakraProvider";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -15,7 +16,9 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body>
-                <ChakraProvider>{children}</ChakraProvider>
+                <TanstackProvider>
+                    <ChakraProvider>{children}</ChakraProvider>
+                </TanstackProvider>
             </body>
         </html>
     );
