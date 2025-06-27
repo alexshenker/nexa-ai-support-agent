@@ -225,6 +225,8 @@ const Layout = ({ children }: PropsWithChildren) => {
                     </Table.Body>
                 </Table.Root>
             </Stack>
+            {/* In the future... pagination here... */}
+
             {/* Results count */}
             <Text mt={4} fontSize="sm" color="gray.500">
                 Showing {sortedTickets.length} of{" "}
