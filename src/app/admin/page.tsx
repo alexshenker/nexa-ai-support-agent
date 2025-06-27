@@ -2,9 +2,17 @@
 import NavButtons from "@/components/Nav/Nav";
 import { Ticket } from "@/types";
 import getTickets from "@/utils/getTickets";
-import { Box, Flex, Input, Stack, Table, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Flex,
+    Input,
+    Skeleton,
+    Stack,
+    Table,
+    Text,
+} from "@chakra-ui/react";
 import { format, parseISO } from "date-fns";
-import { orderBy, startCase } from "lodash";
+import { orderBy, range, startCase, truncate } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 
 // Types
@@ -28,7 +36,7 @@ interface SortConfig {
 }
 
 const formatDate = (dateString: string) => {
-    return format(parseISO(dateString), "MMM d, yyyy h:mm a");
+    return format(parseISO(dateString), "M/d/yyyy h:mmaaa");
 };
 
 /**
@@ -44,6 +52,7 @@ const normalize = (val: string | number): string => {
 
 const Admin = () => {
     const [tickets, setTickets] = useState<Ticket[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [sortConfig, setSortConfig] = useState<SortConfig>({
@@ -69,9 +78,12 @@ const Admin = () => {
         }
 
         (async () => {
+            setLoading(true);
+
             const t = await getTickets();
 
             setTickets(t);
+            setLoading(false);
         })();
     }, [tickets.length]);
 
@@ -165,23 +177,52 @@ const Admin = () => {
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {sortedTickets.map((ticket) => {
-                            return (
-                                <Table.Row key={ticket.id}>
-                                    <Table.Cell>{"#" + ticket.id}</Table.Cell>
-                                    <Table.Cell>{ticket.user_first}</Table.Cell>
-                                    <Table.Cell>{ticket.user_last}</Table.Cell>
-                                    <Table.Cell>{ticket.category}</Table.Cell>
-                                    <Table.Cell>
-                                        {ticket.description}
-                                    </Table.Cell>
-                                    <Table.Cell>{ticket.status}</Table.Cell>
-                                    <Table.Cell>
-                                        {formatDate(ticket.created_at)}
-                                    </Table.Cell>
-                                </Table.Row>
-                            );
-                        })}
+                        {loading ? (
+                            <>
+                                {range(7).map((i) => {
+                                    return (
+                                        <Table.Row key={`skeleton-${i}`}>
+                                            <Table.Cell
+                                                colSpan={columns.length}
+                                            >
+                                                <Skeleton
+                                                    width="100%"
+                                                    height="36px"
+                                                />
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    );
+                                })}
+                            </>
+                        ) : (
+                            sortedTickets.map((ticket) => {
+                                return (
+                                    <Table.Row key={ticket.id}>
+                                        <Table.Cell>
+                                            {"#" + ticket.id}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {ticket.user_first}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {ticket.user_last}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {ticket.category}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {truncate(ticket.description, {
+                                                length: 20,
+                                            })}
+                                        </Table.Cell>
+                                        <Table.Cell>{ticket.status}</Table.Cell>
+                                        <Table.Cell>
+                                            {formatDate(ticket.created_at)}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                );
+                            })
+                        )}
                     </Table.Body>
                 </Table.Root>
             </Stack>
