@@ -2,7 +2,14 @@
 
 import useTicket from "@/lib/useTicket";
 import { TicketId } from "@/types";
-import { Button, CloseButton, Drawer } from "@chakra-ui/react";
+import {
+    Button,
+    CloseButton,
+    Drawer,
+    Skeleton,
+    Stack,
+    Text,
+} from "@chakra-ui/react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -24,23 +31,74 @@ const Ticket = (): React.JSX.Element => {
             open={open}
             onOpenChange={(e) => setOpen(e.open)}
             onExitComplete={() => router.push("/admin")}
+            size="sm"
         >
             <Drawer.Backdrop />
             <Drawer.Positioner>
                 <Drawer.Content>
                     <Drawer.Header>
-                        <Drawer.Title>Drawer Title</Drawer.Title>
+                        <Drawer.Title>
+                            {ticket.isLoading ? (
+                                <Skeleton />
+                            ) : (
+                                `Ticket #${ticket.data?.id ?? " Not Found"}`
+                            )}
+                        </Drawer.Title>
                     </Drawer.Header>
                     <Drawer.Body>
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing
-                            elit. Sed do eiusmod tempor incididunt ut labore et
-                            dolore magna aliqua.
-                        </p>
+                        {ticket.isLoading ? (
+                            <Skeleton boxSize={"10"} />
+                        ) : ticket.data ? (
+                            <Stack>
+                                <Stack>
+                                    {Object.entries(ticket.data).map(
+                                        ([key, value]) => {
+                                            return (
+                                                <Stack
+                                                    key={key}
+                                                    direction="row"
+                                                >
+                                                    <Text fontWeight="bold">
+                                                        {key}:
+                                                    </Text>
+                                                    <Text>{value}</Text>
+                                                </Stack>
+                                            );
+                                        }
+                                    )}
+                                </Stack>
+
+                                {ticket.data.status === "open" ? (
+                                    <Button
+                                        size="sm"
+                                        maxW={"150px"}
+                                        colorPalette={"red"}
+                                        variant="outline"
+                                    >
+                                        Close Ticket
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        maxW={"150px"}
+                                        variant="outline"
+                                        colorPalette={"green"}
+                                    >
+                                        Reopen Ticket
+                                    </Button>
+                                )}
+                            </Stack>
+                        ) : (
+                            <Text>Ticket not found</Text>
+                        )}
                     </Drawer.Body>
                     <Drawer.Footer>
-                        <Button variant="outline">Cancel</Button>
-                        <Button>Save</Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => setOpen(false)}
+                        >
+                            Cancel
+                        </Button>
                     </Drawer.Footer>
                     <Drawer.CloseTrigger asChild>
                         <CloseButton size="sm" />
