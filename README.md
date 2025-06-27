@@ -3,7 +3,7 @@
 Welcome to the AI Support Agent
 
 To tinker with the app you may go to
-[AI Support Agent](https://nexa-ai-support-agent.vercel.app/)
+<u>[AI Support Agent](https://nexa-ai-support-agent.vercel.app/)</u>
 
 ### Test Locally
 
