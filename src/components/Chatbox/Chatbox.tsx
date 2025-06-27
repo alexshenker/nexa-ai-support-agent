@@ -261,9 +261,8 @@ export function ChatBox() {
                 <Button
                     onClick={handleUserMessage}
                     borderRadius="full"
-                    // disabled={!submitEnabled}
-                    colorScheme="teal"
-                    variant="subtle"
+                    disabled={!submitEnabled}
+                    variant="surface"
                 >
                     Send
                 </Button>
