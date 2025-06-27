@@ -83,8 +83,15 @@ const Admin = () => {
         }
 
         const filtered = tickets.filter((ticket) => {
-            const { id, user_first, user_last, category, description, status } =
-                ticket;
+            const {
+                id,
+                user_first,
+                user_last,
+                category,
+                description,
+                status,
+                created_at,
+            } = ticket;
 
             return (
                 normalize(id).includes(searchNormalized) ||
@@ -92,7 +99,9 @@ const Admin = () => {
                 normalize(user_last).includes(searchNormalized) ||
                 normalize(category).includes(searchNormalized) ||
                 normalize(description).includes(searchNormalized) ||
-                normalize(status).includes(searchNormalized)
+                normalize(status).includes(searchNormalized) ||
+                normalize(created_at).includes(searchNormalized) ||
+                normalize(formatDate(created_at)).includes(searchNormalized)
             );
         });
 
