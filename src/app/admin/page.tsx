@@ -1,7 +1,8 @@
 "use client";
+import NavButtons from "@/components/Nav/Nav";
 import { Ticket } from "@/types";
 import getTickets from "@/utils/getTickets";
-import { Box, Flex, Input, Text } from "@chakra-ui/react";
+import { Box, Flex, Input, Stack, Text } from "@chakra-ui/react";
 import { format, parseISO } from "date-fns";
 import { orderBy } from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -117,17 +118,20 @@ const Admin = () => {
 
     return (
         <Box padding={20}>
-            {/* Search Box */}
-            <Flex mb={6}>
-                <Input
-                    placeholder="Search tickets..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    maxW="400px"
-                    borderRadius="md"
-                    paddingX={10}
-                />
-            </Flex>
+            <Stack>
+                <NavButtons />
+                {/* Search Box */}
+                <Flex mb={6}>
+                    <Input
+                        placeholder="Search tickets..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        maxW="400px"
+                        borderRadius="md"
+                        paddingX={10}
+                    />
+                </Flex>
+            </Stack>
 
             {/* Table */}
             <Box overflowX="auto" border="1px solid #E2E8F0" borderRadius="lg">

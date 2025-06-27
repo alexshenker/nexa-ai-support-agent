@@ -2,7 +2,15 @@
 import { AIResponseID, TicketId, UserRequest } from "@/types";
 import { MAX_AI_RESPONSES, MAX_CHARACTERS } from "@/utils/constants";
 import sendUserMessage from "@/utils/sendUserMessage";
-import { Box, Button, Flex, Input, Skeleton, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Field,
+    Flex,
+    Input,
+    Skeleton,
+    Text,
+} from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 } from "uuid";
 import AIMessage from "./AIMessage";
@@ -33,6 +41,8 @@ const initialMessages: Message[] = [
         sender: "system",
     },
 ];
+
+const border = "1px solid rgba(0, 0, 0, 0.4)";
 
 export function ChatBox() {
     /* Used to scroll to the bottom of the chat box */
@@ -130,10 +140,10 @@ export function ChatBox() {
     return (
         <Flex
             direction="column"
-            h="600px"
+            h="400px"
             maxW="500px"
             mx="auto"
-            border="1px solid #3f3f3f"
+            border={border}
             borderRadius="lg"
             overflow="hidden"
             bgColor={"gray.100"}
@@ -142,7 +152,7 @@ export function ChatBox() {
             <Flex
                 px={4}
                 py={3}
-                borderBottom="1px solid #3f3f3f"
+                borderBottom={border}
                 bg="white"
                 align="center"
                 gap={3}
@@ -210,41 +220,52 @@ export function ChatBox() {
             {/* Input Area */}
             <Flex
                 p={4}
-                borderTop="1px solid #3f3f3f"
+                borderTop={border}
                 bg="white"
                 gap={2}
                 bgColor={"gray.100"}
             >
                 <Box width={"100%"}>
-                    <Input
-                        placeholder="Type your message..."
-                        borderRadius="full"
-                        paddingX={10}
-                        onKeyDown={handleEnter}
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        color="gray.600"
-                        disabled={
-                            totalAIResponses >= MAX_AI_RESPONSES ||
-                            ticketID !== null
+                    <Field.Root
+                        invalid={
+                            inputValue.length > MAX_CHARACTERS ||
+                            totalAIResponses >= MAX_AI_RESPONSES
                         }
-                    />
-                    {inputValue.length > MAX_CHARACTERS && (
-                        <Text color="red.500" fontSize="xs">
-                            Message is too long
-                        </Text>
-                    )}
-                    {totalAIResponses >= MAX_AI_RESPONSES && (
-                        <Text color="red.500" fontSize="xs">
-                            Sorry - you&#39;ve reached the chat limit.
-                        </Text>
-                    )}
+                    >
+                        <Input
+                            placeholder="Type your message..."
+                            borderRadius="full"
+                            paddingX={10}
+                            onKeyDown={handleEnter}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            color="gray.600"
+                            disabled={
+                                totalAIResponses >= MAX_AI_RESPONSES ||
+                                ticketID !== null
+                            }
+                        />
+
+                        {inputValue.length > MAX_CHARACTERS && (
+                            <Field.ErrorText>
+                                Message is too long
+                            </Field.ErrorText>
+                        )}
+
+                        {totalAIResponses >= MAX_AI_RESPONSES && (
+                            <Field.ErrorText>
+                                Sorry - you&#39;ve reached the chat limit.
+                            </Field.ErrorText>
+                        )}
+                    </Field.Root>
                 </Box>
 
                 <Button
                     onClick={handleUserMessage}
                     borderRadius="full"
-                    disabled={!submitEnabled}
+                    // disabled={!submitEnabled}
+                    colorScheme="teal"
+                    variant="subtle"
                 >
                     Send
                 </Button>

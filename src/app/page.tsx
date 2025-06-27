@@ -1,13 +1,18 @@
-import { ChatBox } from "@/components/Chatbox/Chatbox";
+"use client";
+import NavButtons from "@/components/Nav/Nav";
 import { Box } from "@chakra-ui/react";
 
 const Dashboard = (): React.JSX.Element => {
     return (
-        <div>
-            <Box padding={10}>
-                <ChatBox />
-            </Box>
-        </div>
+        <Box
+            display={"flex"}
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            height="100vh"
+        >
+            <NavButtons />
+        </Box>
     );
 };
 
