@@ -3,6 +3,7 @@ import {
     AIResponse,
     AIResponseID,
     ResponseToUser,
+    TicketId,
     UserData,
     UserRequest,
 } from "@/types";
@@ -14,6 +15,9 @@ import { zodTextFormat } from "openai/helpers/zod.mjs";
 const ROLE =
     "You are an assistant that interacts with users via a chat interface. Your goal is to guide users through a series of questions that gather information needed to open a support ticket. There is no specific product involved. This is a general support ticket system. ";
 
+const TICKET_CREATED_MESSAGE =
+    "Thank you for providing your information. Your support ticket has been created!";
+
 const INSTRUCTIONS = `You must collect the following information from each user:
 1. First name
 2. Last name
@@ -22,7 +26,8 @@ You must do so by asking the user a series of questions, collecting one piece of
 After the user provides a description, you must create a fitting category for the issue and return it in the outlined object below.
 If the user provides an invalid answer, you must acknowledge their message if you determine that you should, and then ask them to answer the question until all the information has been provided.
 NOTE: Its possible that the user will provide information out of order - you must be able to handle this and ask for the missing information politely.
-Once you've collected all the information, you must thank the user with the first and last names they have provided, and assure them the ticket will be handled shortly.
+Once you've collected all the information, you must the responseToUser value MUST be this exact string: "${TICKET_CREATED_MESSAGE}", and assure them the ticket will be handled shortly.
+Do not inform the user how an issue has been categorized. Just thank them.
 Your response should always be a JSON object with the following structure:
 {
   responseToUser: string,
@@ -102,9 +107,13 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    let ticketId: TicketId | null = null;
+
     if (allDataCollected(parsedOutputText.data.dataCollected)) {
         try {
-            await handleTicketCreation(parsedOutputText.data.dataCollected);
+            ticketId = await handleTicketCreation(
+                parsedOutputText.data.dataCollected
+            );
         } catch (error) {
             console.error("Error handling ticket creation:", error);
             return Response.json(
@@ -119,6 +128,7 @@ export async function POST(request: NextRequest) {
     const responseToUser: ResponseToUser = {
         responseToUser: parsedOutputText.data.responseToUser,
         previous_response_id: response.id as AIResponseID,
+        ticketId,
     };
 
     return Response.json(responseToUser);

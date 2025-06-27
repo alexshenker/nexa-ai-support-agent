@@ -1,5 +1,5 @@
 "use client";
-import { AIResponseID, UserRequest } from "@/types";
+import { AIResponseID, TicketId, UserRequest } from "@/types";
 import { MAX_AI_RESPONSES, MAX_CHARACTERS } from "@/utils/constants";
 import sendUserMessage from "@/utils/sendUserMessage";
 import { Box, Button, Flex, Input, Skeleton, Text } from "@chakra-ui/react";
@@ -37,6 +37,8 @@ const initialMessages: Message[] = [
 export function ChatBox() {
     /* Used to scroll to the bottom of the chat box */
     const chatBoxBottomRef = useRef<HTMLDivElement>(null);
+
+    const [ticketID, setTicketID] = useState<TicketId | null>(null);
 
     const [messages, setMessages] = useState<Message[]>(initialMessages);
 
@@ -93,6 +95,10 @@ export function ChatBox() {
 
         setLastAIResponseID(res.data.previous_response_id);
 
+        if (res.data.ticketId !== null) {
+            setTicketID(res.data.ticketId);
+        }
+
         setMessages((prevMessages) => [
             ...prevMessages,
 
@@ -105,7 +111,10 @@ export function ChatBox() {
     };
 
     const submitEnabled =
-        inputValue.trim() !== "" && inputValue.length <= MAX_CHARACTERS;
+        inputValue.trim() !== "" &&
+        inputValue.length <= MAX_CHARACTERS &&
+        ticketID === null &&
+        totalAIResponses < MAX_AI_RESPONSES;
 
     const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (!submitEnabled) {
@@ -189,6 +198,12 @@ export function ChatBox() {
                         />
                     </Flex>
                 )}
+                {ticketID !== null && (
+                    <AIMessage
+                        key={v4()}
+                        text={`Your ticket ID is: ${ticketID}`}
+                    />
+                )}
                 <div ref={chatBoxBottomRef} />
             </Flex>
 
@@ -209,7 +224,10 @@ export function ChatBox() {
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         color="gray.600"
-                        disabled={totalAIResponses >= MAX_AI_RESPONSES}
+                        disabled={
+                            totalAIResponses >= MAX_AI_RESPONSES &&
+                            ticketID !== null
+                        }
                     />
                     {inputValue.length > MAX_CHARACTERS && (
                         <Text color="red.500" fontSize="xs">

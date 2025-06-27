@@ -25,15 +25,16 @@ export const AIResponse = z.object({
 
 export type AIResponse = z.infer<typeof AIResponse>;
 
+export type TicketId = number & { __brand: "Ticket_Id" };
+export const TicketId = z.custom<TicketId>();
+
 export const ResponseToUser = z.object({
     responseToUser: z.string(),
     previous_response_id: AIResponseID,
+    ticketId: TicketId.nullable(),
 });
 
 export type ResponseToUser = z.infer<typeof ResponseToUser>;
-
-export type TicketId = number & { __brand: "Ticket_Id" };
-export const TicketId = z.custom<TicketId>();
 
 export const ticketStatuses = ["open", "closed"] as const;
 export const TicketStatus = z.enum(ticketStatuses);

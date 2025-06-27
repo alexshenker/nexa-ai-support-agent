@@ -62,17 +62,19 @@ if (categoryCount.count === 0) {
 
 export function createTicket(
     ticket: OmitMod<Ticket, "id" | "status" | "created_at">
-): void {
+): TicketId{
     const stmt = db.prepare(
         "INSERT INTO tickets (user_first, user_last, category, description) VALUES (?, ?, ?, ?)"
     );
 
-    stmt.run(
+   const t = stmt.run(
         ticket.user_first,
         ticket.user_last,
         ticket.category,
         ticket.description
     );
+
+    return t.lastInsertRowid as TicketId;
 }
 
 export function getTickets() {
