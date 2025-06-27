@@ -5,6 +5,7 @@ import sendUserMessage from "@/utils/sendUserMessage";
 import {
     Box,
     Button,
+    Card,
     Field,
     Flex,
     Input,
@@ -42,8 +43,6 @@ const initialMessages: Message[] = [
         sender: "system",
     },
 ];
-
-const border = "1px solid rgba(0, 0, 0, 0.4)";
 
 export function ChatBox() {
     /* Used to scroll to the bottom of the chat box */
@@ -139,39 +138,39 @@ export function ChatBox() {
     };
 
     return (
-        <Flex
+        <Card.Root
             direction="column"
             h="400px"
             maxW="500px"
             mx="auto"
-            border={border}
             borderRadius="lg"
             overflow="hidden"
-            bgColor={"gray.100"}
         >
             {/* Chat Header */}
-            <Flex
-                px={4}
-                py={3}
-                borderBottom={border}
-                bg="white"
-                align="center"
-                gap={3}
-                bgColor={"gray.100"}
-            >
-                <SuppyAvatar />
-                <Box>
-                    <Text fontWeight="bold" color={"gray.600"}>
-                        Suppy the Support Assistant
-                    </Text>
-                    <Text fontSize="xs" color="green.600">
-                        ● Online
-                    </Text>
-                </Box>
-            </Flex>
+            <Card.Header px={4} py={3} gap={3}>
+                <Flex gap={3}>
+                    <SuppyAvatar />
+                    <Box>
+                        <Text fontWeight="bold" color={"gray.600"}>
+                            Suppy the Support Assistant
+                        </Text>
+                        <Text fontSize="xs" color="green.600">
+                            ● Online
+                        </Text>
+                    </Box>
+                </Flex>
+            </Card.Header>
 
             {/* Messages Area */}
-            <Flex flex={1} direction="column" overflowY="auto" p={4} gap={4}>
+            <Card.Body
+                flex={1}
+                direction="column"
+                overflowY="auto"
+                p={4}
+                gap={4}
+                borderTop="1px solid"
+                borderColor="border.emphasized"
+            >
                 {messages.map((message) => {
                     switch (message.sender) {
                         case "user":
@@ -216,15 +215,14 @@ export function ChatBox() {
                     />
                 )}
                 <div ref={chatBoxBottomRef} />
-            </Flex>
+            </Card.Body>
 
             {/* Input Area */}
-            <Flex
+            <Card.Footer
                 p={4}
-                borderTop={border}
-                bg="white"
                 gap={2}
-                bgColor={"gray.100"}
+                borderTop="1px solid"
+                borderColor="border.emphasized"
             >
                 <Box width={"100%"}>
                     <Field.Root
@@ -240,7 +238,6 @@ export function ChatBox() {
                             onKeyDown={handleEnter}
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
-                            color="gray.600"
                             disabled={
                                 totalAIResponses >= MAX_AI_RESPONSES ||
                                 ticketID !== null
@@ -270,7 +267,7 @@ export function ChatBox() {
                 >
                     Send
                 </Button>
-            </Flex>
-        </Flex>
+            </Card.Footer>
+        </Card.Root>
     );
 }

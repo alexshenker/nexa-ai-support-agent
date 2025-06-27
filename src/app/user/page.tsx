@@ -1,3 +1,4 @@
+"use client";
 import { ChatBox } from "@/components/Chatbox/Chatbox";
 import NavButtons from "@/components/Nav/Nav";
 

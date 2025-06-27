@@ -8,8 +8,7 @@ const UserMessage = (props: Props): React.JSX.Element => {
     return (
         <Flex justify="flex-end" gap={3}>
             <Box
-                bg="blue.500"
-                color="white"
+                bg="blue.emphasized"
                 px={4}
                 py={2}
                 borderRadius="lg"

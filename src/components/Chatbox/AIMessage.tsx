@@ -10,13 +10,12 @@ const AIMessage = (props: Props): React.JSX.Element => {
         <Flex gap={3}>
             <SuppyAvatar />
             <Box
-                bg="gray.300"
                 px={4}
                 py={2}
                 borderRadius="lg"
                 borderTopLeftRadius={0}
                 maxW="80%"
-                color={"gray.600"}
+                bg={"gray.muted"}
             >
                 <Text>{props.text}</Text>
             </Box>
